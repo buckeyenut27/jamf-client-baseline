@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  VERIFY BEFORE USE: open this generated profile in the Jamf Connect
+  Configuration app and confirm the keys match your Jamf Connect version.
+  This template covers the core IdP settings only.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>Jamf Connect Menu Bar</string>
+			<key>PayloadIdentifier</key>
+			<string>com.jamf.connect.baseline</string>
+			<key>PayloadType</key>
+			<string>com.jamf.connect</string>
+			<key>PayloadUUID</key>
+			<string>5E2A41B0-0000-4000-8000-000000000005</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>IdPSettings</key>
+			<dict>
+%{ if idp_provider == "entra" ~}
+				<key>Provider</key>
+				<string>Azure</string>
+				<key>ClientID</key>
+				<string>${client_id}</string>
+				<key>ROPGID</key>
+				<string>${client_id}</string>
+				<key>TenantID</key>
+				<string>${tenant_id}</string>
+				<key>RedirectURI</key>
+				<string>${redirect_uri}</string>
+%{ else ~}
+				<key>Provider</key>
+				<string>GoogleID</string>
+				<key>ClientID</key>
+				<string>${client_id}</string>
+				<key>RedirectURI</key>
+				<string>${redirect_uri}</string>
+%{ endif ~}
+			</dict>
+		</dict>
+	</array>
+	<key>PayloadDisplayName</key>
+	<string>Jamf Connect Menu Bar</string>
+	<key>PayloadIdentifier</key>
+	<string>com.mspconsulting.jamfconnect.menubar</string>
+	<key>PayloadScope</key>
+	<string>System</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>5E2A41B0-0000-4000-8000-000000000006</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

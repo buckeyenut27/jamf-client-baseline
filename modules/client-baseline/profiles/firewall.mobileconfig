@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>macOS Firewall</string>
+			<key>PayloadIdentifier</key>
+			<string>com.apple.security.firewall.msp</string>
+			<key>PayloadType</key>
+			<string>com.apple.security.firewall</string>
+			<key>PayloadUUID</key>
+			<string>9C3D4E50-0000-4000-8000-0000000000C2</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>EnableFirewall</key>
+			<true/>
+			<key>BlockAllIncoming</key>
+			<false/>
+			<key>EnableStealthMode</key>
+			<false/>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>Enables the macOS application firewall</string>
+	<key>PayloadDisplayName</key>
+	<string>macOS Firewall - Enabled</string>
+	<key>PayloadIdentifier</key>
+	<string>com.mspconsulting.firewall</string>
+	<key>PayloadScope</key>
+	<string>System</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>9C3D4E50-0000-4000-8000-0000000000C3</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

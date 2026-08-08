@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>AllowUserOverrides</key>
+			<true/>
+			<key>AllowedSystemExtensions</key>
+			<dict>
+				<key>483DWKW443</key>
+				<array>
+					<string>com.jamf.protect.security-extension</string>
+					<string>com.jamf.protect.network-extension.content-filter</string>
+				</array>
+			</dict>
+			<key>NonRemovableFromUISystemExtensions</key>
+			<dict>
+				<key>483DWKW443</key>
+				<array>
+					<string>com.jamf.protect.security-extension</string>
+					<string>com.jamf.protect.network-extension.content-filter</string>
+				</array>
+			</dict>
+			<key>PayloadDescription</key>
+			<string>Jamf Protect System Extension</string>
+			<key>PayloadDisplayName</key>
+			<string>Jamf Protect System Extension</string>
+			<key>PayloadIdentifier</key>
+			<string>236f9491-1e1f-478c-9fa2-0c5ff9988870</string>
+			<key>PayloadOrganization</key>
+			<string>Jamf Protect</string>
+			<key>PayloadType</key>
+			<string>com.apple.system-extension-policy</string>
+			<key>PayloadUUID</key>
+			<string>236f9491-1e1f-478c-9fa2-0c5ff9988870</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>Jamf Protect System Extension</string>
+	<key>PayloadDisplayName</key>
+	<string>Jamf Protect Tamper Prevention</string>
+	<key>PayloadIdentifier</key>
+	<string>1b1dcd5a-bd86-4ace-8dd5-deae54564ffc</string>
+	<key>PayloadOrganization</key>
+	<string>Jamf Protect</string>
+	<key>PayloadRemovalDisallowed</key>
+	<true/>
+	<key>PayloadScope</key>
+	<string>System</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>1b1dcd5a-bd86-4ace-8dd5-deae54564ffc</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

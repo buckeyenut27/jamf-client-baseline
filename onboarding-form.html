@@ -1,0 +1,419 @@
+<!--
+  MAINTENANCE: this form must stay in sync with clients/_TEMPLATE/variables.tf.
+  When a variable is added/renamed in the Terraform template, add/rename the
+  matching field here and in the generate() output. Quick check: every key in
+  the generated tfvars must exist as a `variable "..."` in the template.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>the MSP — Jamf Client Onboarding</title>
+<style>
+  :root { --blue:#1f4e8c; --bg:#f4f6f9; --card:#fff; --border:#d8dee7; --err:#c0392b; --ok:#1e7e34; }
+  * { box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:var(--bg); margin:0; padding:24px; color:#222; }
+  .wrap { max-width:860px; margin:0 auto; }
+  h1 { color:var(--blue); margin:0 0 4px; font-size:1.6em; }
+  .sub { color:#555; margin-bottom:20px; }
+  fieldset { background:var(--card); border:1px solid var(--border); border-radius:10px; margin:0 0 16px; padding:16px 20px; }
+  legend { font-weight:700; color:var(--blue); padding:0 8px; font-size:1.05em; }
+  label { display:block; font-weight:600; margin:12px 0 4px; font-size:.92em; }
+  .hint { font-weight:400; color:#666; font-size:.85em; margin-top:2px; }
+  input[type=text], input[type=password], select { width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:.95em; font-family:inherit; }
+  input.invalid { border-color:var(--err); background:#fdf0ef; }
+  .row { display:flex; gap:16px; flex-wrap:wrap; } .row > div { flex:1; min-width:240px; }
+  .check { display:flex; align-items:center; gap:8px; margin:10px 0 2px; font-weight:600; font-size:.92em; }
+  .check input { width:auto; }
+  .seg { display:flex; gap:0; margin-top:4px; border:1px solid var(--border); border-radius:8px; overflow:hidden; width:max-content; }
+  .seg label { margin:0; padding:8px 18px; cursor:pointer; font-weight:600; background:#eef1f5; border-right:1px solid var(--border); }
+  .seg label:last-child { border-right:none; }
+  .seg input { display:none; }
+  .seg input:checked + span { color:#fff; }
+  .seg label:has(input:checked) { background:var(--blue); color:#fff; }
+  .conditional { border-left:3px solid var(--border); padding-left:14px; margin-top:8px; }
+  .hidden { display:none; }
+  .actions { display:flex; gap:12px; margin:20px 0; flex-wrap:wrap; }
+  button { padding:12px 22px; border:none; border-radius:8px; font-size:1em; font-weight:700; cursor:pointer; }
+  .primary { background:var(--blue); color:#fff; } .primary:hover { background:#16395f; }
+  .secondary { background:#e4e9f0; color:#222; }
+  #errors { color:var(--err); font-weight:600; white-space:pre-line; margin:10px 0; }
+  #output { width:100%; height:300px; font-family:Menlo,monospace; font-size:.82em; border:1px solid var(--border); border-radius:8px; padding:10px; }
+  .next { background:#eaf3ea; border:1px solid #bcd9bf; border-radius:8px; padding:14px 18px; margin-top:14px; font-size:.92em; }
+  .next code { background:#fff; padding:1px 5px; border-radius:4px; }
+  .warn { background:#fff8e6; border:1px solid #e6d49a; border-radius:8px; padding:10px 14px; font-size:.88em; margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Jamf Client Onboarding</h1>
+  <div class="sub">Fill in the values below, then click <b>Generate terraform.tfvars</b>. Everything stays on this computer — nothing is sent anywhere. Where each value comes from: see <b>README.md Step 3</b>.</div>
+
+  <fieldset>
+    <legend>1 · Client</legend>
+    <label>Client name *<input type="text" id="client_name" placeholder="Acme Corp"></label>
+  </fieldset>
+
+  <fieldset>
+    <legend>2 · Jamf Pro tenant</legend>
+    <label>Jamf Pro URL * <span class="hint">e.g. https://acmecorp.jamfcloud.com</span><input type="text" id="jamfpro_instance_fqdn" placeholder="https://CLIENT.jamfcloud.com"></label>
+    <div class="seg">
+      <label><input type="radio" name="jamfauth" value="oauth2" checked><span>API client (standard)</span></label>
+      <label><input type="radio" name="jamfauth" value="basic"><span>Admin username/password</span></label>
+    </div>
+    <div id="jamfpro_oauth_fields" class="row" style="margin-top:8px">
+      <div><label>API Client ID *<input type="text" id="jamfpro_client_id"></label></div>
+      <div><label>API Client Secret * <span class="hint">shown once at creation</span><input type="password" id="jamfpro_client_secret"></label></div>
+    </div>
+    <div id="jamfpro_basic_fields" class="row hidden" style="margin-top:8px">
+      <div><label>Admin username * <span class="hint">must be a LOCAL Jamf Pro account — SSO admins can't basic-auth</span><input type="text" id="jamfpro_basic_username" value="msp_terraform"></label></div>
+      <div><label>Admin password *<input type="password" id="jamfpro_basic_password"></label></div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>3 · Jamf Protect tenant</legend>
+    <label>Jamf Protect URL *<input type="text" id="jamfprotect_url" placeholder="https://CLIENT.protect.jamfcloud.com"></label>
+    <div class="row">
+      <div><label>API Client ID *<input type="text" id="jamfprotect_client_id"></label></div>
+      <div><label>API Client Secret *<input type="password" id="jamfprotect_client_secret"></label></div>
+    </div>
+    <label>Threat prevention posture
+      <select id="jamf_protect_mode">
+        <option>Block and report</option>
+        <option>Report only</option>
+      </select>
+    </label>
+    <div class="check"><input type="checkbox" id="deploy_jamf_protect_profile"><span>Deploy the Protect config profile via Jamf Pro (LEAVE UNCHECKED — known provider issues without the Platform-level API; deploy the profile from the Protect console instead, see manual steps)</span></div>
+  </fieldset>
+
+  <fieldset>
+    <legend>4 · Jamf Platform (macOS update Blueprints)</legend>
+    <div class="check"><input type="checkbox" id="enable_software_update_blueprints" checked><span>Deploy the two software update Blueprints (minor 14d / major 30d, install 23:45)</span></div>
+    <div id="platform_fields" class="conditional">
+      <label>Region
+        <select id="jamfplatform_base_url">
+          <option value="https://us.apigw.jamf.com">US — us.apigw.jamf.com</option>
+          <option value="https://eu.apigw.jamf.com">EU — eu.apigw.jamf.com</option>
+          <option value="https://apac.apigw.jamf.com">APAC — apac.apigw.jamf.com</option>
+        </select>
+      </label>
+      <div class="row">
+        <div><label>Platform API Client ID * <span class="hint">from Jamf Account, not Jamf Pro. IMPORTANT: Platform features also require renaming platform.tf.off → platform.tf in the client folder, then re-running terraform init (the on/off switch is that file, not these toggles)</span><input type="text" id="jamfplatform_client_id"></label></div>
+        <div><label>Platform API Client Secret *<input type="password" id="jamfplatform_client_secret"></label></div>
+      </div>
+      <label>Tenant UUID * <span class="hint">REQUIRED by the released Terraform provider whenever any Platform feature (Blueprints / passcode / CIS) is on. Shown in the Integrations space at account.jamf.com next to the tenant you scoped the API client to.</span><input type="text" id="jamfplatform_tenant_id" placeholder="e.g. 1a2b3c4d-...."></label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>4b · Security baseline &amp; enrollment</legend>
+    <div class="row">
+      <div><label>MSP service admin username <span class="hint">hidden local admin created on EVERY Mac (lockout protection); auto-excluded from DenyLocal</span><input type="text" id="msp_admin_username" value="msp_admin"></label></div>
+      <div><label>MSP service admin password * <span class="hint">unique per client</span><input type="password" id="msp_admin_password"></label></div>
+    </div>
+    <div class="check"><input type="checkbox" id="enable_security_baseline" checked><span>Security pack: FileVault + key escrow, screen lock, firewall, stale-device group</span></div>
+    <div id="security_fields" class="conditional">
+      <label>Screen lock after (minutes idle)<input type="text" id="screen_lock_idle_minutes" value="15"></label>
+    </div>
+    <div class="check"><input type="checkbox" id="enable_passcode_blueprint" checked><span>Passcode policy Blueprint (uses the Platform API credentials above)</span></div>
+    <div id="passcode_fields" class="conditional">
+      <label>Minimum password length <span class="hint">raising this forces non-compliant users to change passwords</span><input type="text" id="passcode_min_length" value="8"></label>
+    </div>
+    <div class="check"><input type="checkbox" id="enable_cis_benchmark" checked><span>CIS Level 1 benchmark — all controls, report-only (never enforced; uses Platform API)</span></div>
+    <div class="check"><input type="checkbox" id="enable_prestage" checked><span>ADE / zero-touch PreStage (client's ABM must be linked to Jamf Pro first)</span></div>
+    <div id="prestage_fields" class="conditional">
+      <div class="row">
+        <div><label>ADE instance ID <span class="hint">"1" for the first ABM token in a fresh tenant</span><input type="text" id="ade_instance_id" value="1"></label></div>
+      </div>
+      <div class="row">
+        <div><label>Support email (shown at enrollment — no phone is shown, per MSP policy)<input type="text" id="support_email" value="helpdesk@example.com"></label></div>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>5 · EDR — pick one</legend>
+    <div class="seg">
+      <label><input type="radio" name="edr" value="huntress" checked><span>Huntress</span></label>
+      <label><input type="radio" name="edr" value="sentinelone"><span>SentinelOne</span></label>
+      <label><input type="radio" name="edr" value="none"><span>None</span></label>
+    </div>
+    <div id="edr_huntress" class="conditional">
+      <div class="row">
+        <div><label>Huntress Account Key *<input type="password" id="huntress_account_key"></label></div>
+        <div><label>Huntress Organization Key * <span class="hint">usually the client name in Huntress</span><input type="text" id="huntress_organization_key"></label></div>
+      </div>
+    </div>
+    <div id="edr_sentinelone" class="conditional hidden">
+      <label>SentinelOne Site Token *<input type="password" id="sentinelone_site_token"></label>
+      <label>S1 installer pkg (in the repo's packages/ folder) * <span class="hint">path relative to the client folder</span><input type="text" id="sentinelone_package_path" placeholder="../../packages/Sentinel-Release_macos_vXX_X_X_XXXX.pkg"></label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>6 · Splashtop</legend>
+    <div class="check"><input type="checkbox" id="enable_splashtop" checked><span>Deploy Splashtop Streamer</span></div>
+    <div id="splashtop_fields" class="conditional">
+      <div class="row">
+        <div><label>Deploy code * <span class="hint">Splashtop console → Management → Deployment</span><input type="password" id="splashtop_deploy_code"></label></div>
+        <div><label>Deploy pkg path *<input type="text" id="splashtop_package_path" placeholder="../../packages/SplashtopStreamerDeploy.pkg"></label></div>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>7 · Jamf Connect — identity provider</legend>
+    <div class="seg">
+      <label><input type="radio" name="idp" value="entra" checked><span>Microsoft Entra ID</span></label>
+      <label><input type="radio" name="idp" value="google"><span>Google Workspace</span></label>
+      <label><input type="radio" name="idp" value="none"><span>None</span></label>
+    </div>
+    <div id="google_edition_note" class="warn hidden" style="margin-top:8px"><b>Validate the Google Workspace edition first:</b> Jamf Connect password sync needs Google's Secure LDAP service — included in Business Plus, Enterprise, Education, Frontline, and Cloud Identity Premium, but <b>NOT Business Starter or Business Standard</b>. Check admin.google.com → Billing → Subscriptions. The login window works on any edition; without Secure LDAP, password sync is unavailable.</div>
+    <div id="jamfconnect_fields">
+      <div class="row" style="margin-top:8px">
+        <div><label>OIDC Client ID * <span class="hint">Entra: Application (client) ID · Google: OAuth client ID</span><input type="text" id="jamf_connect_oidc_client_id"></label></div>
+        <div id="entra_tenant_wrap"><label>Entra Directory (tenant) ID *<input type="text" id="jamf_connect_entra_tenant_id"></label></div>
+      </div>
+      <label>Redirect URI<input type="text" id="jamf_connect_redirect_uri" value="https://127.0.0.1/jamfconnect"></label>
+      <label>Jamf Connect license (base64, optional) <span class="hint">Terminal: base64 -i license-file | pbcopy</span><input type="password" id="jamf_connect_license_b64"></label>
+      <div class="check"><input type="checkbox" id="jamf_connect_deny_local" checked><span>Force all logins through the IdP (DenyLocal) — PreStage admin auto-excluded</span></div>
+      <div class="row">
+        <div><label>Extra excluded local accounts <span class="hint">comma-separated, optional</span><input type="text" id="jamf_connect_excluded_local_accounts" placeholder="it-local, loaner"></label></div>
+        <div><label>Admin group (IdP) <span class="hint">members become local admins; empty = everyone standard. Needs groups claim on the app registration</span><input type="text" id="jamf_connect_admin_group" placeholder="Mac Admins"></label></div>
+      </div>
+      <div class="check"><input type="checkbox" id="jamf_connect_migrate"><span>Takeover client — let users link existing local accounts to their IdP identity at first login</span></div>
+      <label>Help button URL at login window<input type="text" id="jamf_connect_help_url" value="https://example.com"></label>
+      <div id="psso_wrap">
+        <div class="check"><input type="checkbox" id="enable_platform_sso" checked><span>Platform SSO (Entra) — app SSO into 365, Entra device registration, password sync via Company Portal. Runs alongside Jamf Connect; users complete a one-time registration prompt.</span></div>
+        <div id="psso_fields" class="conditional">
+          <label>Company Portal pkg path * <span class="hint">download the CURRENT pkg from go.microsoft.com/fwlink/?linkid=853070 into packages/ — old versions break PSSO</span><input type="text" id="company_portal_package_path" placeholder="../../packages/CompanyPortal-Installer.pkg"></label>
+        </div>
+      </div>
+    </div>
+    <div id="jamfconnect_none_note" class="hint hidden" style="margin-top:8px">No Jamf Connect profiles will be deployed for this client. Note: with the app suite on "auto", no productivity suite is added either — force one in section 8 if needed.</div>
+  </fieldset>
+
+  <fieldset>
+    <legend>8 · Apps</legend>
+    <label>Productivity suite in Self Service
+      <select id="app_suite">
+        <option value="auto">Auto — follow the IdP (Entra → Microsoft 365, Google → Google apps)</option>
+        <option value="microsoft">Force Microsoft 365 suite</option>
+        <option value="google">Force Google apps</option>
+        <option value="none">No suite (core apps only)</option>
+      </select>
+    </label>
+    <div class="check"><input type="checkbox" id="is_1password_customer"><span>1Password customer — push 1Password to all Macs</span></div>
+  </fieldset>
+
+  <div id="errors"></div>
+  <div class="actions">
+    <button class="primary" onclick="generate()">Generate terraform.tfvars</button>
+    <button class="secondary" onclick="downloadFile()" id="dlbtn" disabled>Download terraform.tfvars</button>
+    <button class="secondary" onclick="copyOut()" id="cpbtn" disabled>Copy to clipboard</button>
+  </div>
+
+  <textarea id="output" readonly placeholder="Generated terraform.tfvars appears here..."></textarea>
+
+  <div class="next">
+    <b>Next steps</b> (README Steps 2–5):
+    1) Run <code>./new-client.sh "Client Name"</code> from the repo folder ·
+    2) Save the downloaded <code>terraform.tfvars</code> into <code>clients/&lt;Client-Name&gt;/</code>, replacing the template copy ·
+    3) <code>cd clients/&lt;Client-Name&gt;</code> → <code>terraform init</code> → <code>terraform plan</code> → <code>terraform apply -parallelism=1</code>
+  </div>
+  <div class="warn">The generated file contains <b>secrets</b>. Keep it inside the client folder only — never email it or paste it into tickets.</div>
+  <div class="warn">Tenant-wide settings (Self Service / Self Service+) are <b>owned by this automation</b>: existing tenant values are overridden on first apply, and manual Jamf UI changes are reverted on the next apply.</div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const radio = name => document.querySelector(`input[name=${name}]:checked`).value;
+
+// Show/hide conditional sections
+function refresh() {
+  $('jamfpro_oauth_fields').classList.toggle('hidden', radio('jamfauth') !== 'oauth2');
+  $('jamfpro_basic_fields').classList.toggle('hidden', radio('jamfauth') !== 'basic');
+  $('platform_fields').classList.toggle('hidden', !$('enable_software_update_blueprints').checked && !$('enable_passcode_blueprint').checked && !$('enable_cis_benchmark').checked);
+  $('security_fields').classList.toggle('hidden', !$('enable_security_baseline').checked);
+  $('passcode_fields').classList.toggle('hidden', !$('enable_passcode_blueprint').checked);
+  $('prestage_fields').classList.toggle('hidden', !$('enable_prestage').checked);
+  $('jamfconnect_fields').classList.toggle('hidden', radio('idp') === 'none');
+  $('jamfconnect_none_note').classList.toggle('hidden', radio('idp') !== 'none');
+  $('google_edition_note').classList.toggle('hidden', radio('idp') !== 'google');
+  $('psso_wrap').classList.toggle('hidden', radio('idp') !== 'entra');
+  $('psso_fields').classList.toggle('hidden', !$('enable_platform_sso').checked);
+  $('edr_huntress').classList.toggle('hidden', radio('edr') !== 'huntress');
+  $('edr_sentinelone').classList.toggle('hidden', radio('edr') !== 'sentinelone');
+  $('splashtop_fields').classList.toggle('hidden', !$('enable_splashtop').checked);
+  $('entra_tenant_wrap').classList.toggle('hidden', radio('idp') !== 'entra');
+}
+document.querySelectorAll('input,select').forEach(el => el.addEventListener('change', refresh));
+// Default Huntress org key to client name
+$('client_name').addEventListener('input', () => {
+  const o = $('huntress_organization_key');
+  if (!o.dataset.touched) o.value = $('client_name').value;
+});
+$('huntress_organization_key').addEventListener('input', e => e.target.dataset.touched = 1);
+refresh();
+
+const esc = s => String(s).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+const hclList = s => '[' + s.split(',').map(x => x.trim()).filter(Boolean).map(x => `"${esc(x)}"`).join(', ') + ']';
+const q = id => `"${esc($(id).value.trim())}"`;
+const b = id => $(id).checked ? 'true' : 'false';
+
+function validate() {
+  const errs = []; document.querySelectorAll('input').forEach(i => i.classList.remove('invalid'));
+  const need = (id, label) => { if (!$(id).value.trim()) { errs.push(`Missing: ${label}`); $(id).classList.add('invalid'); } };
+  const needUrl = (id, label) => { need(id, label); const v = $(id).value.trim(); if (v && !/^https:\/\/.+/.test(v)) { errs.push(`${label} must start with https://`); $(id).classList.add('invalid'); } };
+
+  need('client_name', 'Client name');
+  needUrl('jamfpro_instance_fqdn', 'Jamf Pro URL');
+  if (radio('jamfauth') === 'oauth2') {
+    need('jamfpro_client_id', 'Jamf Pro API Client ID');
+    need('jamfpro_client_secret', 'Jamf Pro API Client Secret');
+  } else {
+    need('jamfpro_basic_username', 'Jamf Pro admin username');
+    need('jamfpro_basic_password', 'Jamf Pro admin password');
+  }
+  needUrl('jamfprotect_url', 'Jamf Protect URL');
+  need('jamfprotect_client_id', 'Jamf Protect API Client ID');
+  need('jamfprotect_client_secret', 'Jamf Protect API Client Secret');
+
+  if ($('enable_software_update_blueprints').checked || $('enable_passcode_blueprint').checked || $('enable_cis_benchmark').checked) {
+    need('jamfplatform_client_id', 'Jamf Platform API Client ID');
+    need('jamfplatform_client_secret', 'Jamf Platform API Client Secret');
+    // VERIFIED (live run, 2026-08-01): the released jamfplatform provider
+    // REQUIRES tenant_id at plan time (docs saying "optional" lag the release)
+    need('jamfplatform_tenant_id', 'Jamf Platform Tenant UUID');
+  }
+  if ($('enable_security_baseline').checked) {
+    const m = parseInt($('screen_lock_idle_minutes').value, 10);
+    if (!(m >= 1 && m <= 60)) { errs.push('Screen lock idle minutes must be 1-60'); $('screen_lock_idle_minutes').classList.add('invalid'); }
+  }
+  if ($('enable_passcode_blueprint').checked) {
+    const p = parseInt($('passcode_min_length').value, 10);
+    if (!(p >= 0 && p <= 16)) { errs.push('Minimum password length must be 0-16'); $('passcode_min_length').classList.add('invalid'); }
+  }
+  need('msp_admin_username', 'MSP service admin username');
+  need('msp_admin_password', 'MSP service admin password');
+  if ($('enable_prestage').checked) {
+    need('ade_instance_id', 'ADE instance ID');
+  }
+  if (radio('edr') === 'huntress') {
+    need('huntress_account_key', 'Huntress Account Key');
+    need('huntress_organization_key', 'Huntress Organization Key');
+  }
+  if (radio('edr') === 'sentinelone') {
+    need('sentinelone_site_token', 'SentinelOne Site Token');
+    need('sentinelone_package_path', 'SentinelOne pkg path');
+  }
+  if ($('enable_splashtop').checked) {
+    need('splashtop_deploy_code', 'Splashtop deploy code');
+    need('splashtop_package_path', 'Splashtop deploy pkg path');
+  }
+  if (radio('idp') !== 'none') {
+    need('jamf_connect_oidc_client_id', 'Jamf Connect OIDC Client ID');
+    if (radio('idp') === 'entra') need('jamf_connect_entra_tenant_id', 'Entra Directory (tenant) ID');
+  }
+  if (radio('idp') === 'entra' && $('enable_platform_sso').checked) {
+    need('company_portal_package_path', 'Company Portal pkg path');
+  }
+  return errs;
+}
+
+function generate() {
+  const errs = validate();
+  $('errors').textContent = errs.join('\n');
+  if (errs.length) { $('output').value = ''; $('dlbtn').disabled = $('cpbtn').disabled = true; return; }
+  const edr = radio('edr'), idp = radio('idp');
+  const tf = `# Generated by onboarding-form.html on ${new Date().toISOString().slice(0,16).replace('T',' ')}
+# Client: ${$('client_name').value.trim()}
+# CONTAINS SECRETS - keep inside the client folder only.
+
+client_name = ${q('client_name')}
+
+# Jamf Pro tenant
+jamfpro_instance_fqdn  = ${q('jamfpro_instance_fqdn')}
+jamfpro_auth_method    = "${radio('jamfauth')}"
+jamfpro_client_id      = ${radio('jamfauth') === 'oauth2' ? q('jamfpro_client_id') : '""'}
+jamfpro_client_secret  = ${radio('jamfauth') === 'oauth2' ? q('jamfpro_client_secret') : '""'}
+jamfpro_basic_username = ${radio('jamfauth') === 'basic' ? q('jamfpro_basic_username') : '""'}
+jamfpro_basic_password = ${radio('jamfauth') === 'basic' ? q('jamfpro_basic_password') : '""'}
+
+# Jamf Protect tenant
+jamfprotect_url           = ${q('jamfprotect_url')}
+jamfprotect_client_id     = ${q('jamfprotect_client_id')}
+jamfprotect_client_secret = ${q('jamfprotect_client_secret')}
+jamf_protect_mode         = ${q('jamf_protect_mode')}
+# Profile deployed from the Protect console unless true (provider issues):
+deploy_jamf_protect_profile = ${$('deploy_jamf_protect_profile').checked}
+
+# Jamf Platform (Blueprints)
+enable_software_update_blueprints = ${b('enable_software_update_blueprints')}
+jamfplatform_base_url             = ${q('jamfplatform_base_url')}
+jamfplatform_client_id            = ${q('jamfplatform_client_id')}
+jamfplatform_client_secret        = ${q('jamfplatform_client_secret')}
+jamfplatform_tenant_id            = ${q('jamfplatform_tenant_id')}
+
+# Security baseline & enrollment
+enable_security_baseline  = ${b('enable_security_baseline')}
+screen_lock_idle_minutes  = ${parseInt($('screen_lock_idle_minutes').value, 10) || 15}
+enable_passcode_blueprint = ${b('enable_passcode_blueprint')}
+passcode_min_length       = ${parseInt($('passcode_min_length').value, 10) || 8}
+enable_cis_benchmark      = ${b('enable_cis_benchmark')}
+enable_prestage           = ${b('enable_prestage')}
+ade_instance_id           = ${q('ade_instance_id')}
+msp_admin_username     = ${q('msp_admin_username')}
+msp_admin_password     = ${q('msp_admin_password')}
+support_email             = ${q('support_email')}
+
+# EDR
+edr_provider              = "${edr}"
+huntress_account_key      = ${edr === 'huntress' ? q('huntress_account_key') : '""'}
+huntress_organization_key = ${edr === 'huntress' ? q('huntress_organization_key') : '""'}
+sentinelone_site_token    = ${edr === 'sentinelone' ? q('sentinelone_site_token') : '""'}
+sentinelone_package_path  = ${edr === 'sentinelone' ? q('sentinelone_package_path') : '""'}
+huntress_package_path     = ""
+
+# Splashtop
+enable_splashtop       = ${b('enable_splashtop')}
+splashtop_deploy_code  = ${$('enable_splashtop').checked ? q('splashtop_deploy_code') : '""'}
+splashtop_package_path = ${$('enable_splashtop').checked ? q('splashtop_package_path') : '""'}
+
+# Self Service apps
+app_suite             = ${q('app_suite')}
+common_apps_scope     = "all"
+is_1password_customer = ${b('is_1password_customer')}
+
+# Jamf Connect ("none" = client does not receive Jamf Connect)
+idp_provider                 = "${idp}"
+jamf_connect_oidc_client_id  = ${idp !== 'none' ? q('jamf_connect_oidc_client_id') : '""'}
+jamf_connect_entra_tenant_id = ${idp === 'entra' ? q('jamf_connect_entra_tenant_id') : '""'}
+jamf_connect_redirect_uri    = ${q('jamf_connect_redirect_uri')}
+jamf_connect_license_b64     = ${idp !== 'none' ? q('jamf_connect_license_b64') : '""'}
+enable_jamf_connect_menubar  = false
+jamf_connect_deny_local              = ${idp !== 'none' ? b('jamf_connect_deny_local') : 'false'}
+jamf_connect_excluded_local_accounts = ${idp !== 'none' ? hclList($('jamf_connect_excluded_local_accounts').value) : '[]'}
+jamf_connect_admin_group             = ${idp !== 'none' ? q('jamf_connect_admin_group') : '""'}
+jamf_connect_migrate                 = ${idp !== 'none' ? b('jamf_connect_migrate') : 'false'}
+jamf_connect_help_url                = ${q('jamf_connect_help_url')}
+enable_platform_sso          = ${idp === 'entra' ? b('enable_platform_sso') : 'false'}
+company_portal_package_path  = ${idp === 'entra' && $('enable_platform_sso').checked ? q('company_portal_package_path') : '""'}
+`;
+  $('output').value = tf;
+  $('dlbtn').disabled = $('cpbtn').disabled = false;
+}
+
+function downloadFile() {
+  const blob = new Blob([$('output').value], {type: 'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'terraform.tfvars';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function copyOut() { navigator.clipboard.writeText($('output').value); $('cpbtn').textContent = 'Copied!'; setTimeout(() => $('cpbtn').textContent = 'Copy to clipboard', 1500); }
+</script>
+</body>
+</html>

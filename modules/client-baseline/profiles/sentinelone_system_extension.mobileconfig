@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SentinelOne macOS agent prerequisites (Team ID 4AYE5J54KN):
+  network system extension approval, web content filter, Full Disk Access
+  (PPPC) for the four S1 daemons, notifications, and managed login items.
+  Values match SentinelOne's documented MDM configuration. Validate on a
+  test Mac: System Settings > Privacy & Security should show SentinelOne
+  FDA entries enabled and the network extension allowed without prompts.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>SentinelOne System Extension</string>
+			<key>PayloadIdentifier</key>
+			<string>com.apple.system-extension-policy.msp-s1-sysext</string>
+			<key>PayloadType</key>
+			<string>com.apple.system-extension-policy</string>
+			<key>PayloadUUID</key>
+			<string>7A1B2C30-0000-4000-8000-0000000000A1</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>AllowUserOverrides</key>
+			<true/>
+			<key>AllowedTeamIdentifiers</key>
+			<array>
+				<string>4AYE5J54KN</string>
+			</array>
+			<key>AllowedSystemExtensions</key>
+			<dict>
+				<key>4AYE5J54KN</key>
+				<array>
+					<string>com.sentinelone.network-monitoring</string>
+				</array>
+			</dict>
+			<key>AllowedSystemExtensionTypes</key>
+			<dict>
+				<key>4AYE5J54KN</key>
+				<array>
+					<string>NetworkExtension</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>SentinelOne Network Filter</string>
+			<key>PayloadIdentifier</key>
+			<string>com.apple.webcontent-filter.msp-s1-filter</string>
+			<key>PayloadType</key>
+			<string>com.apple.webcontent-filter</string>
+			<key>PayloadUUID</key>
+			<string>7A1B2C30-0000-4000-8000-0000000000A2</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>FilterType</key>
+			<string>Plugin</string>
+			<key>FilterGrade</key>
+			<string>firewall</string>
+			<key>FilterBrowsers</key>
+			<false/>
+			<key>FilterSockets</key>
+			<true/>
+			<key>PluginBundleID</key>
+			<string>com.sentinelone.extensions-wrapper</string>
+			<key>UserDefinedName</key>
+			<string>SentinelOne</string>
+			<key>FilterDataProviderBundleIdentifier</key>
+			<string>com.sentinelone.network-monitoring</string>
+			<key>FilterDataProviderDesignatedRequirement</key>
+			<string>anchor apple generic and identifier "com.sentinelone.network-monitoring" and (certificate leaf[field.1.2.840.113635.100.6.1.9] /* exists */ or certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = "4AYE5J54KN")</string>
+		</dict>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>SentinelOne PPPC - Full Disk Access</string>
+			<key>PayloadIdentifier</key>
+			<string>com.apple.TCC.configuration-profile-policy.msp-s1-pppc</string>
+			<key>PayloadType</key>
+			<string>com.apple.TCC.configuration-profile-policy</string>
+			<key>PayloadUUID</key>
+			<string>7A1B2C30-0000-4000-8000-0000000000A3</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>Services</key>
+			<dict>
+				<key>SystemPolicyAllFiles</key>
+				<array>
+					<dict>
+						<key>Allowed</key>
+						<true/>
+						<key>CodeRequirement</key>
+						<string>anchor apple generic and identifier "com.sentinelone.sentineld" and (certificate leaf[field.1.2.840.113635.100.6.1.9] /* exists */ or certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = "4AYE5J54KN")</string>
+						<key>Comment</key>
+						<string>Full Disk Access for sentineld</string>
+						<key>Identifier</key>
+						<string>com.sentinelone.sentineld</string>
+						<key>IdentifierType</key>
+						<string>bundleID</string>
+						<key>StaticCode</key>
+						<false/>
+					</dict>
+					<dict>
+						<key>Allowed</key>
+						<true/>
+						<key>CodeRequirement</key>
+						<string>anchor apple generic and identifier "com.sentinelone.sentineld-helper" and (certificate leaf[field.1.2.840.113635.100.6.1.9] /* exists */ or certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = "4AYE5J54KN")</string>
+						<key>Comment</key>
+						<string>Full Disk Access for sentineld-helper</string>
+						<key>Identifier</key>
+						<string>com.sentinelone.sentineld-helper</string>
+						<key>IdentifierType</key>
+						<string>bundleID</string>
+						<key>StaticCode</key>
+						<false/>
+					</dict>
+					<dict>
+						<key>Allowed</key>
+						<true/>
+						<key>CodeRequirement</key>
+						<string>anchor apple generic and identifier "com.sentinelone.sentineld-shell" and (certificate leaf[field.1.2.840.113635.100.6.1.9] /* exists */ or certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = "4AYE5J54KN")</string>
+						<key>Comment</key>
+						<string>Full Disk Access for sentineld-shell</string>
+						<key>Identifier</key>
+						<string>com.sentinelone.sentineld-shell</string>
+						<key>IdentifierType</key>
+						<string>bundleID</string>
+						<key>StaticCode</key>
+						<false/>
+					</dict>
+					<dict>
+						<key>Allowed</key>
+						<true/>
+						<key>CodeRequirement</key>
+						<string>anchor apple generic and identifier "com.sentinelone.sentinel-shell" and (certificate leaf[field.1.2.840.113635.100.6.1.9] /* exists */ or certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = "4AYE5J54KN")</string>
+						<key>Comment</key>
+						<string>Full Disk Access for sentinel-shell</string>
+						<key>Identifier</key>
+						<string>com.sentinelone.sentinel-shell</string>
+						<key>IdentifierType</key>
+						<string>bundleID</string>
+						<key>StaticCode</key>
+						<false/>
+					</dict>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>SentinelOne Notifications</string>
+			<key>PayloadIdentifier</key>
+			<string>com.apple.notificationsettings.msp-s1-notify</string>
+			<key>PayloadType</key>
+			<string>com.apple.notificationsettings</string>
+			<key>PayloadUUID</key>
+			<string>7A1B2C30-0000-4000-8000-0000000000A4</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>NotificationSettings</key>
+			<array>
+				<dict>
+					<key>BundleIdentifier</key>
+					<string>com.sentinelone.SentinelAgent</string>
+					<key>NotificationsEnabled</key>
+					<true/>
+					<key>CriticalAlertEnabled</key>
+					<true/>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>SentinelOne Managed Login Items</string>
+			<key>PayloadIdentifier</key>
+			<string>com.apple.servicemanagement.msp-s1-login</string>
+			<key>PayloadType</key>
+			<string>com.apple.servicemanagement</string>
+			<key>PayloadUUID</key>
+			<string>7A1B2C30-0000-4000-8000-0000000000A5</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>Rules</key>
+			<array>
+				<dict>
+					<key>RuleType</key>
+					<string>TeamIdentifier</string>
+					<key>RuleValue</key>
+					<string>4AYE5J54KN</string>
+				</dict>
+			</array>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>SentinelOne system extension, network filter, Full Disk Access, notifications, and login items</string>
+	<key>PayloadDisplayName</key>
+	<string>SentinelOne - Agent Prerequisites</string>
+	<key>PayloadIdentifier</key>
+	<string>com.mspconsulting.sentinelone.prereqs</string>
+	<key>PayloadOrganization</key>
+	<string>the MSP</string>
+	<key>PayloadScope</key>
+	<string>System</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>7A1B2C30-0000-4000-8000-0000000000A0</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

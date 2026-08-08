@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Splashtop Streamer PPPC (Team ID CPQQ3AW49Y, bundle
+  com.splashtop.Splashtop-Streamer):
+    - Accessibility: allowed silently
+    - Full Disk Access: allowed silently
+    - Screen Recording: macOS does NOT permit silent MDM approval for screen
+      recording. This grants AllowStandardUserToSetSystemService, so any
+      (non-admin) user can flip the toggle when the Streamer asks — that is
+      the most MDM can do, per Apple.
+  Microphone likewise cannot be silently granted; users approve on first use.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>Splashtop Streamer PPPC</string>
+			<key>PayloadIdentifier</key>
+			<string>com.apple.TCC.configuration-profile-policy.msp-splashtop-pppc</string>
+			<key>PayloadType</key>
+			<string>com.apple.TCC.configuration-profile-policy</string>
+			<key>PayloadUUID</key>
+			<string>8B2C3D40-0000-4000-8000-0000000000B1</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>Services</key>
+			<dict>
+				<key>Accessibility</key>
+				<array>
+					<dict>
+						<key>Allowed</key>
+						<true/>
+						<key>CodeRequirement</key>
+						<string>identifier "com.splashtop.Splashtop-Streamer" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = CPQQ3AW49Y</string>
+						<key>Comment</key>
+						<string>Accessibility for remote control</string>
+						<key>Identifier</key>
+						<string>com.splashtop.Splashtop-Streamer</string>
+						<key>IdentifierType</key>
+						<string>bundleID</string>
+						<key>StaticCode</key>
+						<false/>
+					</dict>
+				</array>
+				<key>SystemPolicyAllFiles</key>
+				<array>
+					<dict>
+						<key>Allowed</key>
+						<true/>
+						<key>CodeRequirement</key>
+						<string>identifier "com.splashtop.Splashtop-Streamer" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = CPQQ3AW49Y</string>
+						<key>Comment</key>
+						<string>Full Disk Access for file transfer</string>
+						<key>Identifier</key>
+						<string>com.splashtop.Splashtop-Streamer</string>
+						<key>IdentifierType</key>
+						<string>bundleID</string>
+						<key>StaticCode</key>
+						<false/>
+					</dict>
+				</array>
+				<key>ScreenCapture</key>
+				<array>
+					<dict>
+						<key>Authorization</key>
+						<string>AllowStandardUserToSetSystemService</string>
+						<key>CodeRequirement</key>
+						<string>identifier "com.splashtop.Splashtop-Streamer" and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = CPQQ3AW49Y</string>
+						<key>Comment</key>
+						<string>Screen Recording - standard users may approve (silent grant not permitted by macOS)</string>
+						<key>Identifier</key>
+						<string>com.splashtop.Splashtop-Streamer</string>
+						<key>IdentifierType</key>
+						<string>bundleID</string>
+						<key>StaticCode</key>
+						<false/>
+					</dict>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>Splashtop Streamer privacy permissions (Accessibility, Full Disk Access, Screen Recording approval)</string>
+	<key>PayloadDisplayName</key>
+	<string>Splashtop Streamer - PPPC</string>
+	<key>PayloadIdentifier</key>
+	<string>com.mspconsulting.splashtop.pppc</string>
+	<key>PayloadOrganization</key>
+	<string>the MSP</string>
+	<key>PayloadScope</key>
+	<string>System</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>8B2C3D40-0000-4000-8000-0000000000B0</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

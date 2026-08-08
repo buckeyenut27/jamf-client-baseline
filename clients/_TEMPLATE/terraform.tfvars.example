@@ -1,0 +1,198 @@
+# =====================================================================
+# CLIENT ONBOARDING VALUES — fill in everything below, then save this
+# file as:  terraform.tfvars   (remove ".example" from the name)
+#
+# WHERE EACH VALUE COMES FROM is in README.md, Step 3.
+# Lines starting with # are comments. Keep the quotes around values.
+#
+# SECURITY: terraform.tfvars contains secrets. It stays in this client
+# folder only — never email it or paste it into tickets.
+# =====================================================================
+
+# ── 1. Client ────────────────────────────────────────────────────────
+client_name = "Acme Corp" # PLACEHOLDER — client display name
+
+# ── 2. Jamf Pro tenant ───────────────────────────────────────────────
+jamfpro_instance_fqdn = "https://CLIENT.jamfcloud.com" # PLACEHOLDER
+
+# Auth: "oauth2" = API client (MSP standard — README 3a).
+#       "basic"  = LOCAL Jamf Pro admin username/password (sandbox
+#                  convenience; SSO-backed admins cannot basic-auth).
+jamfpro_auth_method = "oauth2"
+
+# Fill the pair matching the auth method above:
+jamfpro_client_id     = "" # PLACEHOLDER — API Client ID (oauth2)
+jamfpro_client_secret = "" # PLACEHOLDER — shown once at creation (oauth2)
+
+jamfpro_basic_username = "msp_terraform" # basic only — MSP standard local admin
+jamfpro_basic_password = ""                 # basic only — that account's password
+
+# ── 3. Jamf Protect tenant ───────────────────────────────────────────
+# Administrative > API Clients — see README Step 3b
+jamfprotect_url           = "https://CLIENT.protect.jamfcloud.com" # PLACEHOLDER
+jamfprotect_client_id     = ""                                     # PLACEHOLDER
+jamfprotect_client_secret = ""                                     # PLACEHOLDER — shown once
+
+# Posture: "Block and report" for production, "Report only" to monitor first.
+jamf_protect_mode = "Block and report"
+
+# Terraform manages the Protect plan/telemetry/action config, but NOT the
+# plan's config profile (known provider issues without the Platform-level
+# API). Leave false and deploy the profile from the Protect console —
+# see the manual steps output. Flip true only once the provider path works.
+# deploy_jamf_protect_profile = false
+
+# ── 3b. Jamf Platform (Blueprints / passcode / CIS) ──────────────────
+# OFF unless you rename platform.tf.off -> platform.tf in this folder.
+# When that file is ON, ALL THREE credentials below are REQUIRED (the
+# provider authenticates at `terraform plan`, before creating anything).
+# API client created in Jamf Account (account.jamf.com), NOT Jamf Pro.
+# See README Step 3c.
+jamfplatform_base_url      = "https://us.apigw.jamf.com" # us / eu / apac region
+jamfplatform_client_id     = ""                          # PLACEHOLDER
+jamfplatform_client_secret = ""                          # PLACEHOLDER — shown once
+jamfplatform_tenant_id     = ""                          # PLACEHOLDER — REQUIRED whenever any Platform
+#                                                          feature (Blueprints/passcode/CIS) is enabled.
+#                                                          Find it in the Integrations space at
+#                                                          account.jamf.com next to this tenant.
+#                                                          (Provider docs say optional; the released
+#                                                          provider rejects a blank value — verified
+#                                                          on live run 2026-08-01.)
+
+# Two blueprints are created: minor updates (ignore major versions, 14 days)
+# and major upgrades (30 days), both installing at 23:45 device time.
+# (These toggles only matter when platform.tf is enabled — with
+# platform.tf.off, Platform is skipped entirely regardless of values.)
+enable_software_update_blueprints = true
+# Defaults (change only to deviate from MSP standard):
+# software_update_minor_days        = 14
+# software_update_major_days        = 30
+# software_update_install_time      = "23:45"
+# software_update_device_group_name = "All Managed Clients"
+
+# Fleet hygiene (MSP defaults — rarely changed): client check-in every
+# 15 minutes, inventory collects hidden accounts (required for the
+# msp_admin group), weekly forced recon, compliance smart groups.
+# client_checkin_frequency = 15   # allowed: 5, 15, 30, 60
+
+# ── 3c. Security baseline & enrollment ───────────────────────────────
+# FileVault + escrow, screen lock (15 min), firewall, stale-device group:
+enable_security_baseline = true
+
+# Passcode policy Blueprint (min length 8 by default — raising it forces
+# non-compliant users to change passwords):
+enable_passcode_blueprint = true
+# passcode_min_length     = 8
+
+# CIS Level 1 benchmark — all controls, MONITOR/report-only. Enforcement is
+# hardcoded off by MSP policy (uses the Platform API credentials above):
+enable_cis_benchmark = true
+
+# ADE / zero-touch PreStage. PREREQUISITE: link the client's Apple Business
+# Manager to Jamf Pro first (Settings > Automated Device Enrollment).
+enable_prestage = true
+ade_instance_id = "1" # first ABM token in a fresh tenant is "1"
+
+# MSP service admin — HIDDEN local admin created on EVERY Mac (lockout
+# protection / support access). Created at enrollment by the PreStage and
+# self-healed by policy on Macs that miss it. Auto-excluded from Jamf
+# Connect DenyLocal. Set a unique password per client:
+msp_admin_username = "msp_admin"
+msp_admin_password = "" # PLACEHOLDER — required, per-client
+
+# Shown to users during enrollment (no support phone is shown — MSP policy):
+# support_email = "helpdesk@example.com"
+
+# ── 4. EDR — pick ONE ────────────────────────────────────────────────
+edr_provider = "huntress" # "huntress" or "sentinelone" or "none"
+
+# Fill ONLY the section that matches edr_provider:
+huntress_account_key      = "" # PLACEHOLDER — Huntress portal
+huntress_organization_key = "" # PLACEHOLDER — usually the client name in Huntress
+
+sentinelone_site_token   = "" # PLACEHOLDER — S1 console > Sites > this client's site token
+sentinelone_package_path = "" # PLACEHOLDER — local pkg in the repo's packages/ folder,
+#                               e.g. "../../packages/Sentinel-Release_macos_v25_3_1_8253.pkg"
+#                               Terraform uploads it to the tenant JCDS automatically.
+
+# Optional offline fallback only (the Huntress policy self-downloads):
+huntress_package_path = ""
+
+# ── 5. Splashtop ─────────────────────────────────────────────────────
+enable_splashtop       = true
+splashtop_deploy_code  = "" # PLACEHOLDER — Splashtop console > Management > Deployment
+splashtop_package_path = "" # PLACEHOLDER — Composer-built deploy pkg in packages/,
+#                             e.g. "../../packages/SplashtopStreamerDeploy.pkg"
+#                             Terraform uploads it to the tenant JCDS automatically.
+
+# ── 6. Self Service apps ─────────────────────────────────────────────
+# Always offered: Adobe Acrobat Reader, Microsoft Teams, Zoom, Google Chrome.
+# "auto" adds the suite matching the client's IdP (section 7):
+#   Entra client  -> Microsoft 365 suite (Word, Excel, PowerPoint, Outlook, OneNote, OneDrive)
+#   Google client -> Google apps (Google Drive for desktop)
+# Or force it: "microsoft", "google", "none".
+app_suite = "auto"
+
+# Common apps — auto-patched on every client.
+#   In Self Service for everyone: Canva, Slack, VS Code, WhatsApp,
+#     RingCentral, Firefox, Edge, Notion, Dropbox, VLC.
+#   Update-only (hidden unless already installed): the AI apps (Claude,
+#     ChatGPT, Copilot, Gemini, Cursor, Perplexity) PLUS the patch-management
+#     net added 2026-08-01 — browsers (Brave, Arc, Opera), comms (Webex,
+#     Discord, Signal, Loom, Dialpad, Messenger), productivity (Grammarly,
+#     Obsidian, Evernote, Figma, Miro, Asana, ClickUp, Spotify), password
+#     managers (Bitwarden, Keeper), storage (Google Drive, Box Drive), and
+#     Foxit PDF Editor.
+#     These auto-update wherever installed but never appear in Self Service.
+# "all" keeps that default split. "installed_only" makes EVERY common app
+# update-only. Per-app changes: modules/client-baseline/apps.tf.
+common_apps_scope = "all"
+
+# Is this client a 1Password customer? true = 1Password installs
+# automatically on every Mac and stays updated. false = not deployed.
+is_1password_customer = false
+
+# ── 7. Jamf Connect — pick ONE identity provider ─────────────────────
+# "entra" (Microsoft), "google" (Google Workspace), or "none" if this
+# client does not receive Jamf Connect (no profiles are deployed; the
+# OIDC fields below can stay empty).
+idp_provider = "entra"
+
+# From the IdP app registration created for Jamf Connect (README Step 3c):
+jamf_connect_oidc_client_id  = "" # PLACEHOLDER — Entra: Application (client) ID / Google: OAuth client ID
+jamf_connect_entra_tenant_id = "" # PLACEHOLDER — Entra ONLY: Directory (tenant) ID. Leave "" for Google.
+jamf_connect_redirect_uri    = "https://127.0.0.1/jamfconnect"
+
+# Optional. Terminal command to create this value from the license file:
+#   base64 -i jamf-connect-license.json | pbcopy
+jamf_connect_license_b64 = ""
+
+# Login window posture (MSP standard):
+# All logins forced through the IdP; the hidden PreStage admin is always
+# excluded automatically. Add extra excluded local accounts if needed.
+jamf_connect_deny_local              = true
+jamf_connect_excluded_local_accounts = [] # e.g. ["it-local", "loaner"]
+
+# IdP group whose members become local admins (empty = everyone standard).
+# Requires the groups claim on the IdP app registration.
+jamf_connect_admin_group = "" # e.g. "Mac Admins"
+
+# TAKEOVER CLIENTS ONLY: true lets users link their existing local account
+# to their IdP identity at first login (prevents duplicate accounts).
+jamf_connect_migrate = false
+
+# Help button at the login window:
+# jamf_connect_help_url = "https://example.com"
+
+# Entra clients only: Platform SSO alongside Jamf Connect (app SSO into
+# Microsoft 365, Entra device registration, password sync via Company
+# Portal). Ignored for google/none. MSP standard: on.
+enable_platform_sso = true
+# Company Portal pkg — download the CURRENT version from
+# https://go.microsoft.com/fwlink/?linkid=853070 into packages/
+# (old versions break PSSO; the app self-updates via MAU after install):
+company_portal_package_path = "" # PLACEHOLDER when PSSO on, e.g. "../../packages/CompanyPortal-Installer.pkg"
+
+# Leave false until the menu bar profile template has been validated
+# with the Jamf Connect Configuration app (README Step 7).
+enable_jamf_connect_menubar = false

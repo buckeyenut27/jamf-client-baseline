@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>Jamf Connect Login</string>
+			<key>PayloadIdentifier</key>
+			<string>com.jamf.connect.login.baseline</string>
+			<key>PayloadType</key>
+			<string>com.jamf.connect.login</string>
+			<key>PayloadUUID</key>
+			<string>5E2A41B0-0000-4000-8000-000000000001</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+%{ if idp_provider == "entra" ~}
+			<key>OIDCProvider</key>
+			<string>Azure</string>
+			<key>OIDCClientID</key>
+			<string>${client_id}</string>
+			<key>OIDCRedirectURI</key>
+			<string>${redirect_uri}</string>
+			<key>OIDCTenant</key>
+			<string>${tenant_id}</string>
+			<key>OIDCROPGID</key>
+			<string>${client_id}</string>
+%{ else ~}
+			<key>OIDCProvider</key>
+			<string>GoogleID</string>
+			<key>OIDCClientID</key>
+			<string>${client_id}</string>
+			<key>OIDCRedirectURI</key>
+			<string>${redirect_uri}</string>
+%{ endif ~}
+			<key>LocalFallback</key>
+			<true/>
+%{ if deny_local ~}
+			<key>DenyLocal</key>
+			<true/>
+			<key>DenyLocalExcluded</key>
+			<array>
+%{ for account in excluded_accounts ~}
+				<string>${account}</string>
+%{ endfor ~}
+			</array>
+%{ endif ~}
+%{ if admin_group != "" ~}
+			<key>OIDCAdmin</key>
+			<string>${admin_group}</string>
+%{ endif ~}
+%{ if migrate ~}
+			<key>Migrate</key>
+			<true/>
+			<key>MigrateUsersHide</key>
+			<array>
+%{ for account in excluded_accounts ~}
+				<string>${account}</string>
+%{ endfor ~}
+			</array>
+%{ endif ~}
+%{ if help_url != "" ~}
+			<key>HelpURL</key>
+			<string>${help_url}</string>
+%{ endif ~}
+		</dict>
+	</array>
+	<key>PayloadDisplayName</key>
+	<string>Jamf Connect Login</string>
+	<key>PayloadIdentifier</key>
+	<string>com.mspconsulting.jamfconnect.login</string>
+	<key>PayloadScope</key>
+	<string>System</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>5E2A41B0-0000-4000-8000-000000000002</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

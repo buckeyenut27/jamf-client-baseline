@@ -1,0 +1,23 @@
+# Terraform working directories
+**/.terraform/
+crash.log
+crash.*.log
+
+# SECRETS — state and tfvars contain API credentials, tokens, passwords
+**/*.tfstate
+**/*.tfstate.backup
+**/terraform.tfvars
+
+# Client folders are per-tenant and contain secrets — only the template ships
+clients/*
+!clients/_TEMPLATE/
+!clients/README.md
+
+# Vendor installers (large binaries, licensed)
+packages/*.pkg
+packages/*.dmg
+
+# Rollout runner artifacts
+**/.tfplan-rollout
+**/.rollout-plan.log
+.DS_Store

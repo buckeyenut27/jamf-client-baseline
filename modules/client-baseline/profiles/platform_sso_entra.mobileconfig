@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Microsoft Entra Platform SSO (macOS 14+), per Microsoft's documented values:
+  https://learn.microsoft.com/intune/device-configuration/settings-catalog/configure-platform-sso-macos
+  https://learn.microsoft.com/entra/identity-platform/apple-sso-plugin
+  MSP posture: runs ALONGSIDE Jamf Connect (login window/account creation
+  stays with Jamf Connect; PSSO owns app SSO, Entra device registration, and
+  password sync). Jamf Connect menu bar profile stays disabled to avoid
+  duplicate password-sync prompts.
+  Authentication method: Password (local password syncs with Entra).
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadDisplayName</key>
+			<string>Microsoft Entra Platform SSO</string>
+			<key>PayloadIdentifier</key>
+			<string>com.apple.extensiblesso.msp-psso</string>
+			<key>PayloadType</key>
+			<string>com.apple.extensiblesso</string>
+			<key>PayloadUUID</key>
+			<string>AD4E5F60-0000-4000-8000-0000000000D1</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+			<key>ExtensionIdentifier</key>
+			<string>com.microsoft.CompanyPortalMac.ssoextension</string>
+			<key>TeamIdentifier</key>
+			<string>UBF8T346G9</string>
+			<key>Type</key>
+			<string>Redirect</string>
+			<key>URLs</key>
+			<array>
+				<string>https://login.microsoftonline.com</string>
+				<string>https://login.microsoft.com</string>
+				<string>https://sts.windows.net</string>
+				<string>https://login.partner.microsoftonline.cn</string>
+				<string>https://login.chinacloudapi.cn</string>
+				<string>https://login.microsoftonline.us</string>
+				<string>https://login-us.microsoftonline.com</string>
+			</array>
+			<key>ExtensionData</key>
+			<dict>
+				<key>AppPrefixAllowList</key>
+				<string>com.microsoft.,com.apple.,com.jamf.,com.jamfsoftware.</string>
+				<key>browser_sso_interaction_enabled</key>
+				<integer>1</integer>
+				<key>disable_explicit_app_prompt</key>
+				<integer>1</integer>
+			</dict>
+			<key>PlatformSSO</key>
+			<dict>
+				<key>AuthenticationMethod</key>
+				<string>Password</string>
+				<key>UseSharedDeviceKeys</key>
+				<true/>
+				<key>FileVaultPolicy</key>
+				<string>AttemptAuthentication</string>
+			</dict>
+		</dict>
+	</array>
+	<key>PayloadDescription</key>
+	<string>Microsoft Entra Platform SSO via Company Portal (password sync method)</string>
+	<key>PayloadDisplayName</key>
+	<string>Platform SSO - Microsoft Entra ID</string>
+	<key>PayloadIdentifier</key>
+	<string>com.mspconsulting.platformsso</string>
+	<key>PayloadOrganization</key>
+	<string>the MSP</string>
+	<key>PayloadScope</key>
+	<string>System</string>
+	<key>PayloadType</key>
+	<string>Configuration</string>
+	<key>PayloadUUID</key>
+	<string>AD4E5F60-0000-4000-8000-0000000000D0</string>
+	<key>PayloadVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>
